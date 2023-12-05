@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Erreur Interne du Serveur{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Erreur Interne du Serveur</h1>
+    <p>Nous avons rencontré un problème en traitant votre demande. Nos équipes techniques ont été informées et travaillent à résoudre le problème.</p>
+    <p><a href="{% url 'index'%}">Retour à l'accueil</a></p>
+</div>
+{% endblock %}
