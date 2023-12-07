@@ -1,6 +1,5 @@
-[run]
-source = .
-omit =
+[flake8]
+exclude =
     */tests/*
     *tests.py
     */test_*.py
