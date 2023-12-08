@@ -1,5 +1,10 @@
-from django.shortcuts import render
+import logging
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
 from .models import Letting
+
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -17,9 +22,16 @@ def index(request):
     Returns:
         HttpResponse: The rendered index page with the list of lettings.
     """
-    lettings_list = Letting.objects.all()
-    context = {'lettings_list': lettings_list}
-    return render(request, 'lettings/index.html', context)
+    try:
+        logger.info("Affichage de la page d'index des lettings")
+        lettings_list = Letting.objects.all()
+        context = {'lettings_list': lettings_list}
+        return render(request, 'lettings/index.html', context)
+    except Exception as e:
+        logger.error(
+            f"Erreur lors de l'affichage de l'index des lettings: {e}"
+            )
+        raise
 
 
 def letting(request, letting_id):
@@ -37,9 +49,17 @@ def letting(request, letting_id):
     Returns:
         HttpResponse: The rendered page for the specified letting.
     """
-    letting = Letting.objects.get(id=letting_id)
-    context = {
-        'title': letting.title,
-        'address': letting.address,
-    }
-    return render(request, 'lettings/letting.html', context)
+    try:
+        letting = get_object_or_404(Letting, id=letting_id)
+        logger.info(f"Affichage des détails du letting: {letting.title}")
+        context = {
+            'title': letting.title,
+            'address': letting.address,
+        }
+        return render(request, 'lettings/letting.html', context)
+    except Http404:
+        logger.error(f"Le letting avec l'ID {letting_id} n'a pas été trouvé")
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de l'affichage des détails du letting: {e}")
+        raise
