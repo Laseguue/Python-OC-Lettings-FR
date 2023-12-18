@@ -16,7 +16,7 @@ jobs:
           name: Run Tests and Coverage
           command: |
             coverage run manage.py test
-            coverage report --fail-under=[80]
+            coverage report -m --fail-under=[80]
 
 workflows:
   version: 2
