@@ -75,3 +75,26 @@ Utilisation de PowerShell, comme ci-dessus sauf :
 
 - Pour activer l'environnement virtuel, `.\venv\Scripts\Activate.ps1` 
 - Remplacer `which <my-command>` par `(Get-Command <my-command>).Path`
+
+### Pipeline d'Intégration et de Déploiement Continu (CI/CD)
+
+Ce projet utilise un pipeline CI/CD configuré avec CircleCI pour automatiser les tests et le déploiement. Le pipeline se compose des étapes suivantes :
+
+#### 1. Build et Test
+- Cette étape utilise l'image Docker `cimg/python:3.12.1` pour créer un environnement de test. Elle inclut les sous-étapes suivantes :
+  - **Checkout** : Récupération du code source du repository GitHub.
+  - **Installation des Dépendances** : Installation des dépendances du projet à partir de `requirements.txt`.
+  - **Linting** : Exécution de `flake8` pour vérifier la conformité du code aux conventions de style PEP8.
+  - **Tests et Couverture** : Exécution des tests unitaires avec `pytest` et mesure de la couverture du code. La build échoue si la couverture du code est inférieure à 80%.
+
+#### 2. Build et Push Docker
+- Cette étape construit une image Docker du projet et la pousse sur Docker Hub. Elle est exécutée après la réussite de l'étape "Build et Test". Les sous-étapes comprennent :
+  - **Checkout** : Récupération du code source.
+  - **Configuration de Docker** : Préparation de l'environnement Docker.
+  - **Construction de l'Image Docker** : Création de l'image Docker en utilisant le `Dockerfile` du projet.
+  - **Connexion à Docker Hub** : Connexion au Docker Hub en utilisant les identifiants fournis via les variables d'environnement.
+  - **Push de l'Image Docker** : Envoi de l'image Docker sur Docker Hub avec un tag correspondant au SHA du commit dans Git.
+
+#### Workflows
+- Les workflows définissent l'ordre d'exécution des jobs et leurs dépendances :
+  - **build-and-test-workflow** : Exécute d'abord le job `build-and-test`, suivi par `build-and-push-docker`. Le job `build-and-push-docker` nécessite que le job `build-and-test` s'exécute avec succès.
