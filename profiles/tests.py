@@ -1,8 +1,9 @@
-from django.test import TestCase
-from django.contrib.auth.models import User
-from .models import Profile
 from django.urls import reverse, resolve
+from django.test import TestCase, override_settings
+from unittest.mock import patch
+from django.contrib.auth.models import User
 from .views import index, profile
+from .models import Profile
 
 
 class ProfileModelTest(TestCase):
@@ -36,9 +37,40 @@ class ProfilesViewsTest(TestCase):
 
     def test_profile_view(self):
         user = User.objects.get(username='testuser')
-        response = self.client.get(reverse('profiles:profile', args=[user.username]))
+        response = self.client.get(
+            reverse('profiles:profile', args=[user.username])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profiles/profile.html')
+
+
+@override_settings(DEBUG=False)
+class ProfilesViewsExceptionTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create_user(username='testuser', password='12345')
+        Profile.objects.create(user=user, favorite_city="Paris")
+
+    @patch('profiles.models.Profile.objects.all')
+    def test_index_view_exception(self, mock_profiles_all):
+        mock_profiles_all.side_effect = Exception("Test exception")
+
+        with self.assertRaises(Exception):
+            self.client.get(reverse('profiles:index'))
+
+    def test_profile_view_http404_exception(self):
+        response = self.client.get(
+            reverse('profiles:profile', args=['nonexistentuser'])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch('profiles.views.get_object_or_404')
+    def test_profile_view_general_exception(self, mock_get_object_or_404):
+        mock_get_object_or_404.side_effect = Exception("Test exception")
+
+        with self.assertRaises(Exception):
+            self.client.get(reverse('profiles:profile', args=['testuser']))
 
 
 class ProfilesURLsTest(TestCase):

@@ -11,5 +11,4 @@ omit =
     */settings.py
     */asgi.py
     */wsgi.py
-    */views.py
     manage.py

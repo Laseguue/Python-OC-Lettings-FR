@@ -1,8 +1,5 @@
 [flake8]
 exclude =
-    */tests/*
-    *tests.py
-    */test_*.py
     */migrations/*
     */admin.py
     */apps.py
