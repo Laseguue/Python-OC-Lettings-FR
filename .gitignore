@@ -2,6 +2,5 @@
 *.pyc
 venv
 .env
-datadump.json
 django_debug.log
 django_error.log
