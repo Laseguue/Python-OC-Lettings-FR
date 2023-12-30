@@ -36,31 +36,29 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Install Heroku CLI
-          command: |
-            curl https://cli-assets.heroku.com/install.sh | sh
-      - run:
           name: Build Docker Image
           command: docker build -t ghostdogthe1/python:${CIRCLE_SHA1} .
       - run:
           name: Log in to Docker Hub
           command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
-          name: Log in to Heroku Registry
-          command: |
-            echo "${HEROKU_API_KEY}" | docker login --username=_ --password-stdin registry.heroku.com
-      - run:
           name: Push Docker Image to Docker Hub
           command: docker push ghostdogthe1/python:${CIRCLE_SHA1}
+
+  deploy-to-heroku:
+    docker:
+      - image: cimg/python:3.12.1
+    steps:
+      - checkout
       - run:
-          name: Tag and Push Docker Image to Heroku Registry
+          name: Install Heroku CLI
           command: |
-            docker tag ghostdogthe1/python:${CIRCLE_SHA1} registry.heroku.com/${HEROKU_APP_NAME}/web
-            docker push registry.heroku.com/${HEROKU_APP_NAME}/web
+            curl https://cli-assets.heroku.com/install.sh | sh
       - run:
-          name: Release Docker Container on Heroku
+          name: Deploy to Heroku
           command: |
-            heroku container:release web -a ${HEROKU_APP_NAME}
+            heroku git:remote -a ${HEROKU_APP_NAME}
+            git push heroku master
 
 workflows:
   version: 2
@@ -70,3 +68,6 @@ workflows:
       - build-and-push-docker:
           requires:
             - build-and-test
+      - deploy-to-heroku:
+          requires:
+            - build-and-push-docker
