@@ -25,6 +25,10 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: Install Heroku CLI
+          command: |
+            curl https://cli-assets.heroku.com/install.sh | sh
+      - run:
           name: Build Docker Image
           command: docker build -t ghostdogthe1/python:${CIRCLE_SHA1} .
       - run:
@@ -33,6 +37,12 @@ jobs:
       - run:
           name: Push Docker Image to Docker Hub
           command: docker push ghostdogthe1/python:${CIRCLE_SHA1}
+      - run:
+          name: Deploy to Heroku
+          command: |
+            docker tag ghostdogthe1/python:${CIRCLE_SHA1} registry.heroku.com/${HEROKU_APP_NAME}/web
+            docker push registry.heroku.com/${HEROKU_APP_NAME}/web
+            heroku container:release web -a ${HEROKU_APP_NAME}
 
 workflows:
   version: 2

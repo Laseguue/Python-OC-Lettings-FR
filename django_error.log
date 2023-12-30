@@ -1043,3 +1043,5 @@ Traceback (most recent call last):
   File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/unittest/mock.py", line 1183, in _execute_mock_call
     raise effect
 Exception: Test exception
+ERROR 2023-12-30 13:55:40,451 basehttp 21235 123145440231424 You're accessing the development server over HTTPS, but it only supports HTTP.
+ERROR 2023-12-30 13:55:40,457 basehttp 21235 123145440231424 You're accessing the development server over HTTPS, but it only supports HTTP.
