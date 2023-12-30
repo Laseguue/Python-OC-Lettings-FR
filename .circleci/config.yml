@@ -51,14 +51,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Heroku CLI
-          command: |
-            curl https://cli-assets.heroku.com/install.sh | sh
-      - run:
           name: Deploy to Heroku
           command: |
-            heroku git:remote -a ${HEROKU_APP_NAME}
-            git push heroku master
+            curl -n -X PATCH https://api.heroku.com/apps/${HEROKU_APP_NAME}/github -d '{
+              "updates": [
+                {
+                  "build": true
+                }
+              ]
+            }' -H "Content-Type: application/json" -H "Authorization: Bearer ${HEROKU_API_KEY}" -H "Accept: application/vnd.heroku+json; version=3"
+
 
 workflows:
   version: 2
