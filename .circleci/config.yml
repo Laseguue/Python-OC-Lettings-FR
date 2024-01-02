@@ -45,6 +45,25 @@ jobs:
           name: Push Docker Image to Docker Hub
           command: docker push ghostdogthe1/python:${CIRCLE_SHA1}
 
+    
+  deploy-to-heroku:
+    docker:
+      - image: cimg/python:3.12.1
+    steps:
+      - checkout
+      - run:
+          name: Install Heroku CLI
+          command: |
+            curl https://cli-assets.heroku.com/install.sh | sh
+      - run:
+          name: Heroku Login
+          command: heroku container:login
+      - run:
+          name: Deploy to Heroku
+          command: |
+            heroku container:push web --app python-oc-lettings-fr
+            heroku container:release web --app python-oc-lettings-fr
+
 workflows:
   version: 2
   build-and-test-workflow:
@@ -53,3 +72,6 @@ workflows:
       - build-and-push-docker:
           requires:
             - build-and-test
+      - deploy-to-heroku:
+          requires:
+            - build-and-push-docker
