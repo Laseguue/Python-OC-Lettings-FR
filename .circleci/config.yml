@@ -4,14 +4,25 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/python:3.12.1
+      - image: circleci/postgres:12.4
+        environment:
+          POSTGRES_USER: testuser
+          POSTGRES_DB: testdb
+          POSTGRES_PASSWORD: testpassword
     steps:
       - checkout
       - run:
           name: Install Dependencies
           command: pip install -r requirements.txt
       - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
           name: Run Linting
           command: flake8 .
+      - run:
+          name: Collect Static Files
+          command: python manage.py collectstatic --noinput
       - run:
           name: Run Tests and Coverage
           command: |
