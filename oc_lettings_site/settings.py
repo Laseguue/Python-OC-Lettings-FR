@@ -182,3 +182,7 @@ LOGGING = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = ['https://python-oc-lettings-fr-498b525ee1a4.herokuapp.com']
+SECURE_SSL_REDIRECT = True
