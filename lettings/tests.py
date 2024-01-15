@@ -42,14 +42,14 @@ class LettingsViewsTest(TestCase):
         Letting.objects.create(title="Test Letting", address=address)
 
     def test_index_view(self):
-        response = self.client.get(reverse('lettings:index'))
+        response = self.client.get(reverse('lettings:index'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'lettings/index.html')
 
     def test_letting_view(self):
         letting_id = Letting.objects.get(title="Test Letting").id
         response = self.client.get(
-            reverse('lettings:letting', args=[letting_id])
+            reverse('lettings:letting', args=[letting_id]), follow=True
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'lettings/letting.html')
@@ -62,7 +62,7 @@ class LettingsViewsExceptionTest(TestCase):
         mock_lettings_all.side_effect = Exception("Test exception")
 
         with self.assertRaises(Exception):
-            self.client.get(reverse('lettings:index'))
+            self.client.get(reverse('lettings:index'), follow=True)
 
     @classmethod
     def setUpTestData(cls):
@@ -77,7 +77,7 @@ class LettingsViewsExceptionTest(TestCase):
     def test_letting_view_http404_exception(self):
         non_existent_id = self.letting.id + 1
         response = self.client.get(
-            reverse('lettings:letting', args=[non_existent_id])
+            reverse('lettings:letting', args=[non_existent_id]), follow=True
         )
 
         self.assertEqual(response.status_code, 404)
@@ -88,7 +88,7 @@ class LettingsViewsExceptionTest(TestCase):
 
         with self.assertRaises(Exception):
             self.client.get(
-                reverse('lettings:letting', args=[self.letting.id])
+                reverse('lettings:letting', args=[self.letting.id]), follow=True
             )
 
 

@@ -31,14 +31,14 @@ class ProfilesViewsTest(TestCase):
         Profile.objects.create(user=user, favorite_city="Paris")
 
     def test_index_view(self):
-        response = self.client.get(reverse('profiles:index'))
+        response = self.client.get(reverse('profiles:index'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profiles/index.html')
 
     def test_profile_view(self):
         user = User.objects.get(username='testuser')
         response = self.client.get(
-            reverse('profiles:profile', args=[user.username])
+            reverse('profiles:profile', args=[user.username]), follow=True
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profiles/profile.html')
@@ -56,11 +56,11 @@ class ProfilesViewsExceptionTests(TestCase):
         mock_profiles_all.side_effect = Exception("Test exception")
 
         with self.assertRaises(Exception):
-            self.client.get(reverse('profiles:index'))
+            self.client.get(reverse('profiles:index'), follow=True)
 
     def test_profile_view_http404_exception(self):
         response = self.client.get(
-            reverse('profiles:profile', args=['nonexistentuser'])
+            reverse('profiles:profile', args=['nonexistentuser']), follow=True
         )
 
         self.assertEqual(response.status_code, 404)
@@ -70,7 +70,7 @@ class ProfilesViewsExceptionTests(TestCase):
         mock_get_object_or_404.side_effect = Exception("Test exception")
 
         with self.assertRaises(Exception):
-            self.client.get(reverse('profiles:profile', args=['testuser']))
+            self.client.get(reverse('profiles:profile', args=['testuser']), follow=True)
 
 
 class ProfilesURLsTest(TestCase):

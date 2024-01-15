@@ -7,7 +7,7 @@ from oc_lettings_site import views as main_views
 
 class MainIndexViewTest(TestCase):
     def test_index_view(self):
-        response = self.client.get(reverse('index'))
+        response = self.client.get(reverse('index'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'index.html')
 
@@ -22,11 +22,11 @@ class MainURLsTest(TestCase):
         self.assertTrue(resolve(url).func.__name__, admin.site.urls)
 
     def test_lettings_url_inclusion(self):
-        response = self.client.get('/lettings/')
+        response = self.client.get('/lettings/', follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_profiles_url_inclusion(self):
-        response = self.client.get('/profiles/')
+        response = self.client.get('/profiles/', follow=True)
         self.assertEqual(response.status_code, 200)
 
 
@@ -37,4 +37,4 @@ class MainViewsExceptionTest(TestCase):
         mock_render.side_effect = Exception("Test exception")
 
         with self.assertRaises(Exception):
-            self.client.get(reverse('index'))
+            self.client.get(reverse('index'), follow=True)
